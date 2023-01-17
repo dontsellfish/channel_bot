@@ -89,7 +89,6 @@ func (db *Database) EditPost(post *Post) error {
 		if size == 0 {
 			logIfError(db.client.SRem(redisContext, db.toKey("times"), original.ScheduledTime).Err())
 		}
-		logIfError(db.client.SRem(redisContext, db.toKey("times"), original.ScheduledTime).Err())
 
 		logIfError(db.client.SAdd(redisContext, db.toKey("times"), post.ScheduledTime).Err())
 		logIfError(db.client.SAdd(redisContext, db.toKey("time", post.ScheduledTime), post.Id).Err())
