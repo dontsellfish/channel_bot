@@ -99,8 +99,8 @@ var ChannelBotCommands = []tele.Command{
 		Text:        "/remove",
 		Description: "delete the post from the database",
 	}, {
-		Text:        "/schedule",
-		Description: "[HH:MM...] change schedule",
+		Text:        "/source",
+		Description: "post sources in the comments of the post",
 	}, {
 		Text:        "/notext",
 		Description: "clear text of the post",
@@ -111,14 +111,14 @@ var ChannelBotCommands = []tele.Command{
 		Text:        "/nocommenttext",
 		Description: "clear text of a post's comment",
 	}, {
-		Text:        "/source",
-		Description: "post sources in the comments of the post",
-	}, {
 		Text:        "/docs",
 		Description: "convert docs to images in comments (or vice-versa)",
 	}, {
 		Text:        "/protected",
 		Description: "make post protected/unprotected",
+	}, {
+		Text:        "/schedule",
+		Description: "[HH:MM...] change schedule",
 	}, {
 		Text:        "/clear",
 		Description: "[all] remove all post from DB",
