@@ -46,14 +46,6 @@ func (handler *AlbumHandler) register(ctx tele.Context) error {
 	handler.registerMutex.Lock()
 
 	message := deepCopyViaJsonSorryJesusChrist(ctx.Message())
-	switch {
-	case message.Voice != nil:
-		return errors.New("voice messages are not supported right now")
-	case message.Sticker != nil:
-		return errors.New("stickers are not supported right now")
-	case message.VideoNote != nil:
-		return errors.New("video notes are not supported right now")
-	}
 
 	id := mediaGroupToId(message)
 	if _, contains := handler.albums[id]; !contains {
