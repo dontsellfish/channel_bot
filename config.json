@@ -1,0 +1,15 @@
+{
+  "token": "",
+  "admin-list": [
+  ],
+  "default-post-times": [
+    "07:00",
+    "12:00"
+  ],
+  "channel-id": 1,
+  "comments-id": 1,
+  "start-message": "Hmm?..",
+  "temporary-files-directory": "./data",
+  "redis-address": "localhost:6379",
+  "config-path": "config.json"
+}
