@@ -8,21 +8,18 @@ import (
 	"github.com/go-redis/redis/v8"
 	"log"
 	"strings"
-	"sync"
 	"time"
 )
 
 var redisContext = context.Background()
 
 type Database struct {
-	mutex  sync.Mutex
 	client *redis.Client
 	prefix string
 }
 
 func NewDatabase(prefix string, opt *redis.Options) *Database {
 	return &Database{
-		mutex:  sync.Mutex{},
 		client: redis.NewClient(opt),
 		prefix: prefix,
 	}
@@ -35,9 +32,6 @@ func (db *Database) toKey(args ...string) string {
 }
 
 func (db *Database) SetPost(id string, post *Post) error {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-
 	err := db.client.SAdd(redisContext, db.toKey("times"), post.ScheduledTime).Err()
 	if err != nil {
 		return nil
@@ -64,9 +58,6 @@ func (db *Database) SetPost(id string, post *Post) error {
 }
 
 func (db *Database) EditPost(post *Post) error {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-
 	if post == nil {
 		return errors.New("post is nil, what")
 	}
@@ -78,9 +69,7 @@ func (db *Database) EditPost(post *Post) error {
 	}
 
 	original, err := db.GetPost(post.Id)
-	if err != nil {
-		return err
-	}
+	logIfError(err)
 
 	if original.ScheduledTime != post.ScheduledTime {
 		logIfError(db.client.SRem(redisContext, db.toKey("time", original.ScheduledTime), post.Id).Err())
@@ -94,13 +83,19 @@ func (db *Database) EditPost(post *Post) error {
 		logIfError(db.client.SAdd(redisContext, db.toKey("time", post.ScheduledTime), post.Id).Err())
 	}
 
-	return db.client.Set(redisContext, db.toKey("post", post.Id), post, 0).Err()
+	b, _ := json.Marshal(post)
+	log.Println("before set", string(b))
+	err = db.client.Set(redisContext, db.toKey("post", post.Id), post, 0).Err()
+	logIfError(err)
+	post, err = db.GetPost(post.Id)
+	logIfError(err)
+	b, _ = json.Marshal(post)
+	log.Println("get after", string(b))
+
+	return nil
 }
 
 func (db *Database) RemPost(post *Post) error {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-
 	errs := make([]string, 0)
 	err := db.client.SRem(redisContext, db.toKey("time", post.ScheduledTime), post.Id).Err()
 	size, err := db.client.SCard(redisContext, db.toKey("time", post.ScheduledTime)).Result()
@@ -165,9 +160,6 @@ func (db *Database) AddRecentlyPosted(id string, idInChannel int) error {
 	if err != nil {
 		return err
 	}
-
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
 	return db.client.Set(redisContext, db.toKey("recent", fmt.Sprintf("%d", idInChannel)), id, time.Minute).Err()
 }
 
@@ -181,9 +173,6 @@ func (db *Database) GetRecentlyPosted(idInChannel int) (*Post, error) {
 }
 
 func (db *Database) AddTemporaryMessageLink(link MessageLink, id string) error {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-
 	return db.client.Set(redisContext,
 		db.toKey("admin-chat", fmt.Sprintf("%d", link.ChatId), "msg-id", fmt.Sprintf("%d", link.MessageId)),
 		id,

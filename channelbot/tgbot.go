@@ -268,6 +268,7 @@ func (bot *ChannelBot) Start() {
 		if timeRegex.Match([]byte(ctx.Text())) {
 			message, err = bot.Telegram.Reply(ctx.Message(), fmt.Sprintf("Time '%s' --> '%s'", post.ScheduledTime, ctx.Text()))
 			post.ScheduledTime = ctx.Text()
+			err = bot.Database.EditPost(post)
 		} else if ctx.Text() == "/source" {
 			if !post.IsDocuments() {
 				message, err = bot.Telegram.Reply(ctx.Message(), "Nothing could be changed.")
@@ -326,6 +327,7 @@ func (bot *ChannelBot) Start() {
 			text := tgMessageToMarkdown(ctx.Text()[:len(ctx.Text())-len(".p")], ctx.Message().Entities)
 			message, err = bot.Telegram.Reply(ctx.Message(), fmt.Sprintf("Post text '%s' --> '%s'", post.Text, text))
 			post.Text = text
+			err = bot.Database.EditPost(post)
 		} else {
 			text := tgMessageToMarkdown(ctx.Text(), ctx.Message().Entities)
 			message, err = bot.Telegram.Reply(ctx.Message(), fmt.Sprintf("Comment text '%s' --> '%s'", post.Text, text))
@@ -340,7 +342,7 @@ func (bot *ChannelBot) Start() {
 			bot.MakeExpiring(time.Second*15, *message)
 		}
 
-		return bot.Database.EditPost(post)
+		return nil
 	})
 	bot.Telegram.Handle("/start", func(ctx tele.Context) error {
 		return ctx.Send(bot.Config.StartMessage)
