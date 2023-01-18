@@ -34,6 +34,7 @@ type Config struct {
 	Verbose               bool   `json:"verbose,omitempty"`
 	Local                 bool   `json:"local,omitempty"`
 	Sync                  bool   `json:"sync,omitempty"`
+	Url                   string `json:"url,omitempty"`
 
 	ConfigPath string `json:"config-path,omitempty"`
 }

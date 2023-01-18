@@ -31,6 +31,7 @@ func New(config Config) (bot *ChannelBot, err error) {
 	bot = &ChannelBot{Telegram: nil, Config: config.FillDefaults(), Converter: NewConverter()}
 	bot.Telegram, err = tele.NewBot(tele.Settings{
 		Token:       bot.Config.Token,
+		URL:         bot.Config.Url,
 		Poller:      &tele.LongPoller{Timeout: time.Minute},
 		Synchronous: config.Sync,
 		Verbose:     config.Verbose,
