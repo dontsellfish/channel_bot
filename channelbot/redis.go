@@ -102,15 +102,12 @@ func (db *Database) RemPost(post *Post) error {
 	db.mutex.Lock()
 
 	errs := make([]string, 0)
-	err := db.client.SRem(redisContext, db.toKey("times"), post.ScheduledTime).Err()
-	if err != nil {
-		errs = append(errs, err.Error())
+	err := db.client.SRem(redisContext, db.toKey("time", post.ScheduledTime), post.Id).Err()
+	size, err := db.client.SCard(redisContext, db.toKey("time", post.ScheduledTime)).Result()
+	if size == 0 {
+		err = db.client.SRem(redisContext, db.toKey("times"), post.ScheduledTime).Err()
 	}
 	err = db.client.SRem(redisContext, db.toKey("posts"), post.Id).Err()
-	if err != nil {
-		errs = append(errs, err.Error())
-	}
-	err = db.client.SRem(redisContext, db.toKey("time", post.ScheduledTime), post.Id).Err()
 	if err != nil {
 		errs = append(errs, err.Error())
 	}

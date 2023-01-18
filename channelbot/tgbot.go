@@ -44,6 +44,9 @@ func New(config Config) (bot *ChannelBot, err error) {
 			if msg == nil {
 				msg = &tele.Message{Chat: &tele.Chat{}}
 			}
+			if msg.Chat == nil {
+				msg.Chat = &tele.Chat{}
+			}
 			report := fmt.Sprintf("Error: %v\nChat: %s %s %s (%d)\nMessageId: %d",
 				err,
 				msg.Chat.FirstName,
