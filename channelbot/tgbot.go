@@ -55,7 +55,7 @@ func New(config Config) (bot *ChannelBot, err error) {
 				msg.Chat.ID,
 				msg.ID,
 			)
-			sendAll(ctx.Bot(), config.AdminList, report)
+			sendAll(bot.Telegram, config.AdminList, report)
 		},
 	})
 	if err != nil {
